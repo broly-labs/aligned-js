@@ -1,0 +1,35 @@
+{
+  "name": "aligned",
+  "version": "0.0.1",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "description": "Aligned",
+  "author": "",
+  "homepage": "",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "license": "ISC",
+  "scripts": {
+    "build": "tsc",
+    "start": "node lib/index.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@types/ws": "^8.5.12",
+    "async-mutex": "^0.5.0",
+    "cbor": "^10.0.2",
+    "cbor-x": "^1.6.0",
+    "ethers": "^6.13.4",
+    "inquirer": "^12.0.1",
+    "sha3": "^2.1.4",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.8.1",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  }
+}
