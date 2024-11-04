@@ -1,8 +1,5 @@
 import { ethers } from 'ethers';
-import { 
-  Network, 
-  PriceEstimate, 
-} from './core/types';
+import { AlignedVerificationData, Network, PriceEstimate } from "./core/types"
 import { 
   ADDITIONAL_SUBMISSION_GAS_COST_PER_PROOF,
   CONSTANT_GAS_COST,
@@ -10,6 +7,7 @@ import {
   MAX_FEE_DEFAULT_PROOF_NUMBER,
 } from './core/constants';
 import { batcherPaymentService } from './eth/batcherPaymentService';
+import { alignedServiceManager } from './eth/alignedServiceManager';
 import { 
   NonceError,
   ChainIdError,
@@ -280,3 +278,41 @@ export async function depositToAligned(
 //     throw new FileError('WriteError', e instanceof Error ? e.message : 'Unknown error');
 //   }
 // }
+
+
+export async function isProofVerified(
+  alignedVerificationData: AlignedVerificationData,
+  network: Network,
+  rpcUrl: string
+): Promise<boolean> {
+  try {
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
+    const contractAddress = getAlignedServiceManagerAddress(network);
+    const paymentServiceAddr = getPaymentServiceAddress(network);
+
+    // All the elements from the merkle proof have to be concatenated
+    const merkleProof = new Uint8Array(
+      alignedVerificationData.batchInclusionProof.merklePath.reduce(
+        (arr, path) => [...arr, ...Array.from(path)],
+        [] as number[]
+      )
+    );
+
+    const verification = alignedVerificationData.verificationDataCommitment;
+
+    const serviceManager = await alignedServiceManager(provider, contractAddress);
+
+    return await serviceManager.verifyBatchInclusion(
+      verification.proofCommitment,
+      verification.publicInputCommitment,
+      verification.provingSystemAuxDataCommitment,
+      verification.proofGeneratorAddr,
+      alignedVerificationData.batchMerkleRoot,
+      merkleProof,
+      BigInt(alignedVerificationData.indexInBatch),
+      paymentServiceAddr
+    );
+  } catch (e) {
+    throw new Error(`Failed to verify proof: ${e}`);
+  }
+}

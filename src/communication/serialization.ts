@@ -1,4 +1,3 @@
-/* eslint-disable */
 import * as cbor from 'cbor';
 
 export async function cborSerialize(value: any): Promise<Buffer> {
