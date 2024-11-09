@@ -1,9 +1,8 @@
 {
-  "name": "aligned",
+  "name": "aligned-js",
   "version": "0.1.0",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "description": "Aligned",
+  "main": "lib/index.js",
+  "description": "Aligned is a JavaScript library for interacting with the Aligned layer",
   "author": "",
   "homepage": "",
   "directories": {
@@ -11,10 +10,15 @@
     "test": "__tests__"
   },
   "license": "ISC",
+  "files": [
+    "lib"
+  ],
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc",
-    "start": "node lib/index.js",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@types/ws": "^8.5.12",

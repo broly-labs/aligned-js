@@ -1,0 +1,17 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "main": "proof.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "ethers": "^6.13.4"
+  }
+}
