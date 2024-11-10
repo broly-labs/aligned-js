@@ -24,7 +24,6 @@ export async function awaitBatchVerification(
             `Proof not verified yet. Waiting ${TIME_BETWEEN_RETRIES} seconds before checking again...`
         );
         
-        // Create a promise that resolves after the delay
         await new Promise(resolve => setTimeout(resolve, TIME_BETWEEN_RETRIES * 1000));
     }
 
