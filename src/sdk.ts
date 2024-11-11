@@ -293,8 +293,8 @@ async function _submitMultiple(
 		socket, paymentServiceAddr, verificationData, maxFee, wallet, toBigInt(nonce)
 	);
 
-	let numResponses = 0;
-	let verificationDataCommitmentsRev: VerificationDataCommitment[] = 
+	const numResponses = 0;
+	const verificationDataCommitmentsRev: VerificationDataCommitment[] = 
 		[...sentVerificationData]
 		.reverse()
 		.map(vd => VerificationDataCommitment.fromData(vd.verificationData));

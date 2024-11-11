@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as ethers from "ethers";
 import { Keccak } from "sha3";
 

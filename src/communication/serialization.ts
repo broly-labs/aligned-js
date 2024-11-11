@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as cbor from 'cbor';
 
 export async function cborSerialize(value: any): Promise<Buffer> {
