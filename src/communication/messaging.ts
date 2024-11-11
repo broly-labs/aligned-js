@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ethers } from 'ethers';
 import WebSocket from 'ws';
 import {
@@ -42,7 +43,7 @@ export async function sendMessages(
         const msgBin = await cborSerialize(JSON.parse(clientMsg.toString()));
         
         await new Promise<void>((resolve, reject) => {
-            let isSocketOpen = socket.readyState === WebSocket.OPEN;
+            const isSocketOpen = socket.readyState === WebSocket.OPEN;
 
             if (!isSocketOpen) {
                 socket.addEventListener('open', () => {

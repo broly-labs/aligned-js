@@ -1,6 +1,19 @@
-# Aligned-JS
+# Aligned JS
 
-Aligned-js is a JavaScript library for interacting with the Aligned layer.
+Aligned JS is a JavaScript library for interacting with the Aligned layer.
+
+## Installation
+
+```bash
+# latest official release (main branch)
+$ npm install aligned-js
+
+# or for latest pre-release version (develop branch)
+$ npm install aligned-js@next
+
+# or for latest beta release version (beta branch)
+$ npm install aligned-js@beta
+```
 
 ## SDK API Reference
 
