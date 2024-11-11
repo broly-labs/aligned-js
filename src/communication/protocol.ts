@@ -1,46 +1,68 @@
 import WebSocket from 'ws';
-import { ResponseMessage } from '../core/types';
+import { SubmitError } from '../core/errors';
 import { cborDeserialize } from './serialization';
 
-export const EXPECTED_PROTOCOL_VERSION = 4;
+const EXPECTED_PROTOCOL_VERSION = 4;
 
-export async function checkProtocolVersion(wsRead: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-      const ws = new WebSocket(wsRead);
+export async function checkProtocolVersion(batcherUrl: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        try {
+            const socket = new WebSocket(batcherUrl);
 
-      ws.on('message', async (data: Buffer) => {
-          try {
-              // Deserialize CBOR data
-              const msg = cborDeserialize<ResponseMessage>(new Uint8Array(data));
+            socket.on('message', async (response: Buffer) => {
+                try {
+                    const msg = await cborDeserialize(response);
 
-              // Check if the deserialized data is an object and has the correct key
-              if (typeof msg === 'object' && msg !== null && 'ProtocolVersion' in msg) {
-                  const protocolVersion = (msg).ProtocolVersion;
+                    if (typeof msg === 'object' && msg !== null && 'ProtocolVersion' in msg) {
+                        const protocolVersion = msg['ProtocolVersion'];
 
-                  if (protocolVersion === EXPECTED_PROTOCOL_VERSION) {
-                      resolve();
-                  } else {
-                      reject(`Protocol version mismatch: received ${protocolVersion}, expected ${EXPECTED_PROTOCOL_VERSION}`);
-                  }
-              } else {
-                  reject("Unexpected message format or missing 'ProtocolVersion' key");
-              }
-          } catch (e) {
-              reject(e);
-          } finally {
-              ws.close();
-          }
-      });
+                        if (Number(protocolVersion) > EXPECTED_PROTOCOL_VERSION) {
+                            socket.close();
+                            reject(new ProtocolVersionMismatch(Number(protocolVersion), EXPECTED_PROTOCOL_VERSION));
+                            return;
+                        }
+                        socket.close();
+                        resolve();
+                    } else {
+                        socket.close();
+                        reject(new UnexpectedBatcherResponse());
+                    }
+                } catch (error) {
+                    socket.close();
+                    reject(SubmitError.genericError(`Error processing message: ${(error as Error).message}`));
+                }
+            });
 
-      ws.on('error', (error) => {
-          reject(`WebSocket error: ${error.message}`);
-          ws.close();
-      });
+            socket.on('error', (error) => {
+                socket.close();
+                reject(SubmitError.webSocketConnectionError(error.message));
+            });
 
-      // Set a timeout for response
-      setTimeout(() => {
-          reject("No response received within timeout");
-          ws.close();
-      }, 5000); // 5 second timeout
-  });
+            socket.on('close', (code, reason) => {
+                if (!socket.CLOSED) {
+                    reject(SubmitError.genericError(
+                        `WebSocket connection closed unexpectedly: ${code} ${reason}`
+                    ));
+                }
+            });
+
+        } catch (error) {
+            reject(SubmitError.genericError(`Unexpected error: ${(error as Error).message}`));
+        }
+    });
+}
+
+class ProtocolVersionMismatch extends SubmitError {
+    constructor(current: number, expected: number) {
+        super(
+            "ProtocolVersionMismatch",
+            { current, expected }
+        );
+    }
+}
+
+class UnexpectedBatcherResponse extends SubmitError {
+    constructor(message: string = "Batcher did not respond with the protocol version") {
+        super("UnexpectedBatcherResponse", message);
+    }
 }
